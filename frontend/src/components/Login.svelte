@@ -2,7 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
 	
 	const dispatch = createEventDispatcher();
-	const API_URL = 'http://localhost:8000/api';
+	const API_URL = 'http://127.0.0.1:8000/api';
 	
 	let nombreCompleto = '';
 	let error = '';
@@ -13,7 +13,7 @@
 		loading = true;
 		
 		try {
-			const response = await fetch(`${API_URL}/login/`, {
+			const response = await fetch(`http://127.0.0.1:8000/api/login/`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

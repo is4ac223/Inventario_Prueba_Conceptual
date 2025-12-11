@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+
 # Sistema de Gestión de Inventario
 
 Sistema de demostración para registro de movimientos de inventario con Django (backend) y Svelte (frontend).
@@ -23,26 +24,31 @@ Sistema de demostración para registro de movimientos de inventario con Django (
 ### Backend (Django)
 
 1. Navegar a la carpeta backend:
+
 ```bash
 cd backend
 ```
 
 2. Instalar dependencias:
+
 ```bash
 pip install djangorestframework django-cors-headers
 ```
 
 3. Ejecutar migraciones:
+
 ```bash
 python manage.py migrate
 ```
 
 4. Crear datos de prueba:
+
 ```bash
 python manage.py crear_datos_prueba
 ```
 
 5. Iniciar el servidor:
+
 ```bash
 python manage.py runserver
 ```
@@ -52,16 +58,19 @@ El backend estará disponible en `http://localhost:8000`
 ### Frontend (Svelte)
 
 1. Navegar a la carpeta frontend:
+
 ```bash
 cd frontend
 ```
 
 2. Instalar dependencias:
+
 ```bash
 npm install
 ```
 
 3. Iniciar el servidor de desarrollo:
+
 ```bash
 npm run dev
 ```
@@ -80,6 +89,7 @@ Para hacer login, ingrese el nombre completo exacto.
 ## 📦 Datos de Ejemplo
 
 Se crean automáticamente:
+
 - 2 Encargados de Inventario
 - 2 Inventarios
 - 6 Materias Primas (Azúcar, Harina, Levadura, Sal, Aceite, Leche en Polvo)
@@ -92,6 +102,7 @@ Se crean automáticamente:
 **Actor Principal:** Encargado de Inventario
 
 **Flujo Básico:**
+
 1. El encargado inicia sesión con su nombre
 2. Selecciona el tipo de ítem (Producto o Materia Prima)
 3. Elige el ítem específico del catálogo
@@ -103,6 +114,7 @@ Se crean automáticamente:
 9. El inventario se actualiza en tiempo real
 
 **Validaciones:**
+
 - Ítem debe existir en el catálogo
 - Cantidad debe ser numérica y mayor a 0
 - Motivo es obligatorio
@@ -133,14 +145,17 @@ Prueba_Concepto/
 ## 🔌 API Endpoints
 
 ### Autenticación
+
 - `POST /api/login/` - Login de encargado
 
 ### Consulta
+
 - `GET /api/productos/` - Listar productos
 - `GET /api/materias-primas/` - Listar materias primas
 - `GET /api/movimientos/` - Listar movimientos
 
 ### Operaciones
+
 - `POST /api/registrar-movimiento/` - Registrar movimiento de inventario
 
 ### Ejemplo de Registro de Movimiento
@@ -160,13 +175,16 @@ Prueba_Concepto/
 ## 🎨 Capturas de Pantalla
 
 ### Login
+
 Interfaz simple de autenticación donde el encargado ingresa su nombre completo.
 
 ### Dashboard
+
 - **Panel Izquierdo:** Formulario de registro de movimientos
 - **Panel Derecho:** Vista en tiempo real del inventario con indicadores de stock
 
 ### Características Visuales
+
 - Código de colores para estados de stock (Normal, Bajo, Sin stock)
 - Actualización automática del inventario
 - Mensajes de confirmación y advertencia
@@ -175,12 +193,14 @@ Interfaz simple de autenticación donde el encargado ingresa su nombre completo.
 ## 🛠️ Tecnologías Utilizadas
 
 ### Backend
+
 - Django 6.0
 - Django REST Framework 3.16
 - django-cors-headers 4.9
 - SQLite (desarrollo)
 
 ### Frontend
+
 - Svelte
 - Rollup (bundler)
 - Fetch API
@@ -195,6 +215,7 @@ Interfaz simple de autenticación donde el encargado ingresa su nombre completo.
 ## 🔒 Consideraciones de Seguridad
 
 Este es un proyecto de demostración. Para producción:
+
 - Implementar autenticación real (JWT, OAuth)
 - Agregar permisos y roles
 - Validar entradas en el backend
@@ -204,8 +225,10 @@ Este es un proyecto de demostración. Para producción:
 
 ## 📄 Licencia
 
-Proyecto de demostración educativa.
-=======
+# Proyecto de demostración educativa.
+
 # Inventario_Prueba_Conceptual
+
 Prueba conceptual para un modulo de gestion de inventario
->>>>>>> 6ae905fd1f6d5f3c51138079ff77127465e6fd07
+
+> > > > > > > 6ae905fd1f6d5f3c51138079ff77127465e6fd07

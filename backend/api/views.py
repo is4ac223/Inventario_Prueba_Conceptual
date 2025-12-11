@@ -138,6 +138,8 @@ class LoginEncargadoView(APIView):
 
     def post(self, request):
         nombre = request.data.get('nombre_completo', '').strip()
+        print(
+            f"Todos los que existen son: {EncargadoInventario.objects.all()}")
 
         if not nombre:
             return Response({
@@ -145,6 +147,8 @@ class LoginEncargadoView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            print(
+                f"Todos los que existen son: {EncargadoInventario.objects.all()}")
             encargado = EncargadoInventario.objects.get(
                 nombre_completo__iexact=nombre)
             serializer = EncargadoInventarioSerializer(encargado)
@@ -153,6 +157,9 @@ class LoginEncargadoView(APIView):
                 'encargado': serializer.data
             }, status=status.HTTP_200_OK)
         except EncargadoInventario.DoesNotExist:
+            print(
+                f"Todos los que existen son: {EncargadoInventario.objects.all()}")
             return Response({
                 'error': 'Encargado no encontrado. Verifique el nombre.'
             }, status=status.HTTP_404_NOT_FOUND)
+        print("no existes pendejo")

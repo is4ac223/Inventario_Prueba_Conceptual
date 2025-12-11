@@ -122,6 +122,7 @@
 <div class="registro-form">
 	<form on:submit|preventDefault={handleSubmit}>
 		<div class="form-group">
+			<!-- svelte-ignore a11y-label-has-associated-control -->
 			<label>Tipo de Ítem:</label>
 			<div class="radio-group">
 				<label class="radio-label">
