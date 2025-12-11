@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Sistema de Gestión de Inventario
 
 Sistema de demostración para registro de movimientos de inventario con Django (backend) y Svelte (frontend).
@@ -204,3 +205,7 @@ Este es un proyecto de demostración. Para producción:
 ## 📄 Licencia
 
 Proyecto de demostración educativa.
+=======
+# Inventario_Prueba_Conceptual
+Prueba conceptual para un modulo de gestion de inventario
+>>>>>>> 6ae905fd1f6d5f3c51138079ff77127465e6fd07
