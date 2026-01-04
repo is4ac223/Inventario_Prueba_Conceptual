@@ -87,6 +87,7 @@ class MovimientoInventario(models.Model):
     """Movimientos del inventario"""
     fecha = models.DateField()
     cantidad = models.IntegerField()
+    motivo = models.TextField(blank=True, null=True)
     encargado = models.ForeignKey(
         EncargadoInventario,
         on_delete=models.CASCADE,

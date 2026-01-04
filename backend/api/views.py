@@ -215,6 +215,7 @@ class RegistrarMovimientoView(APIView):
         movimiento = MovimientoInventario.objects.create(
             fecha=timezone.now().date(),
             cantidad=cantidad,
+            motivo=motivo,
             tipo_movimiento=tipo_movimiento,
             encargado=encargado
         )
