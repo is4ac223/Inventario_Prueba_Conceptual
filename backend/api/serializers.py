@@ -30,15 +30,49 @@ class InventarioSerializer(serializers.ModelSerializer):
 class MateriaPrimaSerializer(serializers.ModelSerializer):
     class Meta:
         model = MateriaPrima
-        fields = ['id', 'nombre', 'stock_minimo', 'stock_actual',
+        fields = ['id', 'nombre', 'descripcion', 'stock_minimo', 'stock_actual',
                   'costo_unitario', 'inventario']
+        extra_kwargs = {
+            'inventario': {'required': False}
+        }
+
+    def create(self, validated_data):
+        # Si no se proporciona inventario, usar el primero disponible o crear uno
+        if 'inventario' not in validated_data:
+            inventario = Inventario.objects.first()
+            if not inventario:
+                from datetime import date
+                inventario = Inventario.objects.create(
+                    ubicacion_almacenamiento='Principal',
+                    capacidad_maxima=10000,
+                    fecha_ultima_revision=date.today()
+                )
+            validated_data['inventario'] = inventario
+        return super().create(validated_data)
 
 
 class ProductoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Producto
-        fields = ['id', 'nombre', 'stock_minimo', 'stock_actual',
+        fields = ['id', 'nombre', 'descripcion', 'stock_minimo', 'stock_actual',
                   'precio_unitario', 'inventario']
+        extra_kwargs = {
+            'inventario': {'required': False}
+        }
+
+    def create(self, validated_data):
+        # Si no se proporciona inventario, usar el primero disponible o crear uno
+        if 'inventario' not in validated_data:
+            inventario = Inventario.objects.first()
+            if not inventario:
+                from datetime import date
+                inventario = Inventario.objects.create(
+                    ubicacion_almacenamiento='Principal',
+                    capacidad_maxima=10000,
+                    fecha_ultima_revision=date.today()
+                )
+            validated_data['inventario'] = inventario
+        return super().create(validated_data)
 
 
 class MovimientoInventarioSerializer(serializers.ModelSerializer):

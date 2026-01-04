@@ -27,6 +27,7 @@ class TipoMovimiento(models.TextChoices):
 class ItemInventario(models.Model):
     """Clase base abstracta para productos y materias primas"""
     nombre = models.TextField()
+    descripcion = models.TextField(blank=True, null=True)
     stock_minimo = models.IntegerField()
     stock_actual = models.PositiveIntegerField()
 

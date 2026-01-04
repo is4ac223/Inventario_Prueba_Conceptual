@@ -28,30 +28,138 @@ class InventarioViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = InventarioSerializer
 
 
-class MateriaPrimaViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet para consultar materias primas"""
-    queryset = MateriaPrima.objects.all()
-    serializer_class = MateriaPrimaSerializer
+class MateriaPrimaListCreateView(APIView):
+    """Vista para listar y crear materias primas"""
 
-    @action(detail=False, methods=['get'])
-    def con_stock(self, request):
-        """Obtener solo items con stock"""
-        items = self.queryset.filter(stock_actual__gt=0)
-        serializer = self.get_serializer(items, many=True)
-        return Response(serializer.data)
+    def get(self, request):
+        """Obtener todas las materias primas"""
+        materias_primas = MateriaPrima.objects.all()
+        serializer = MateriaPrimaSerializer(materias_primas, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        """Crear una nueva materia prima"""
+        serializer = MateriaPrimaSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProductoViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet para consultar productos"""
-    queryset = Producto.objects.all()
-    serializer_class = ProductoSerializer
+class MateriaPrimaDetailView(APIView):
+    """Vista para obtener, actualizar y eliminar una materia prima"""
 
-    @action(detail=False, methods=['get'])
-    def con_stock(self, request):
-        """Obtener solo items con stock"""
-        items = self.queryset.filter(stock_actual__gt=0)
-        serializer = self.get_serializer(items, many=True)
-        return Response(serializer.data)
+    def get_object(self, pk):
+        try:
+            return MateriaPrima.objects.get(pk=pk)
+        except MateriaPrima.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        """Obtener una materia prima específica"""
+        materia_prima = self.get_object(pk)
+        if not materia_prima:
+            return Response(
+                {'error': 'Materia prima no encontrada'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = MateriaPrimaSerializer(materia_prima)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        """Actualizar una materia prima"""
+        materia_prima = self.get_object(pk)
+        if not materia_prima:
+            return Response(
+                {'error': 'Materia prima no encontrada'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = MateriaPrimaSerializer(materia_prima, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        """Eliminar una materia prima"""
+        materia_prima = self.get_object(pk)
+        if not materia_prima:
+            return Response(
+                {'error': 'Materia prima no encontrada'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        materia_prima.delete()
+        return Response(
+            {'mensaje': 'Materia prima eliminada exitosamente'},
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+
+class ProductoListCreateView(APIView):
+    """Vista para listar y crear productos"""
+
+    def get(self, request):
+        """Obtener todos los productos"""
+        productos = Producto.objects.all()
+        serializer = ProductoSerializer(productos, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        """Crear un nuevo producto"""
+        serializer = ProductoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductoDetailView(APIView):
+    """Vista para obtener, actualizar y eliminar un producto"""
+
+    def get_object(self, pk):
+        try:
+            return Producto.objects.get(pk=pk)
+        except Producto.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        """Obtener un producto específico"""
+        producto = self.get_object(pk)
+        if not producto:
+            return Response(
+                {'error': 'Producto no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = ProductoSerializer(producto)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        """Actualizar un producto"""
+        producto = self.get_object(pk)
+        if not producto:
+            return Response(
+                {'error': 'Producto no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = ProductoSerializer(producto, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        """Eliminar un producto"""
+        producto = self.get_object(pk)
+        if not producto:
+            return Response(
+                {'error': 'Producto no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        producto.delete()
+        return Response(
+            {'mensaje': 'Producto eliminado exitosamente'},
+            status=status.HTTP_204_NO_CONTENT
+        )
 
 
 class MovimientoInventarioViewSet(viewsets.ReadOnlyModelViewSet):
