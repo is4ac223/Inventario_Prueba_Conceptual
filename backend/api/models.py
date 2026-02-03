@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 # Enumeraciones
@@ -58,7 +59,9 @@ class EncargadoInventario(models.Model):
     fecha_contrato = models.DateField()
     tipo_documento = models.CharField(
         max_length=20,
-        choices=TipoDocumento.choices
+        choices=TipoDocumento.choices,
+        blank=True,
+        null=True
     )
 
     class Meta:
@@ -74,6 +77,10 @@ class Inventario(models.Model):
     ubicacion_almacenamiento = models.CharField(max_length=255)
     capacidad_maxima = models.IntegerField()
     fecha_ultima_revision = models.DateField()
+    total_materia_prima_almacenada = models.IntegerField(
+        default=0, blank=True, null=True)
+    total_producto_almacenado = models.IntegerField(
+        default=0, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Inventario'
@@ -82,12 +89,42 @@ class Inventario(models.Model):
     def __str__(self):
         return f"Inventario - {self.ubicacion_almacenamiento}"
 
+    def guardar_estado(self):
+        """
+        Crea un respaldo del estado actual del inventario.
+        Integración con patrón Memento.
+        """
+        from api.patterns.memento import HistorialInventario
+        historial = HistorialInventario()
+        return historial.respaldar(self)
+
+    def restaurar_estado(self, estado):
+        """
+        Restaura el inventario a un estado anterior.
+        Integración con patrón Memento.
+        """
+        self.ubicacion_almacenamiento = estado.ubicacion_almacenamiento
+        self.capacidad_maxima = estado.capacidad_maxima
+        self.fecha_ultima_revision = estado.fecha_ultima_revision
+        self.save()
+
+    def actualizar_totales(self):
+        """Actualiza los totales de materias primas y productos"""
+        self.total_materia_prima_almacenada = self.materias_primas.count()
+        self.total_producto_almacenado = self.productos.count()
+        self.save()
+
 
 class MovimientoInventario(models.Model):
     """Movimientos del inventario"""
-    fecha = models.DateField()
+    fecha = models.DateField(default=timezone.now)
+    fecha_llegada = models.DateField(blank=True, null=True)
+    fecha_registro = models.DateTimeField(blank=True, null=True)
     cantidad = models.IntegerField()
     motivo = models.TextField(blank=True, null=True)
+    responsable_ejecuta = models.CharField(
+        max_length=255, blank=True, null=True)
+    item_movido = models.CharField(max_length=255, blank=True, null=True)
     encargado = models.ForeignKey(
         EncargadoInventario,
         on_delete=models.CASCADE,
@@ -99,7 +136,8 @@ class MovimientoInventario(models.Model):
     )
     inventarios = models.ManyToManyField(
         Inventario,
-        related_name='movimientos'
+        related_name='movimientos',
+        blank=True
     )
 
     class Meta:
@@ -193,3 +231,18 @@ class DetalleOrden(models.Model):
     @property
     def subtotal(self):
         return self.cantidad * self.precio_negociado
+
+
+class Notificacion(models.Model):
+    """Notificaciones del sistema de inventario"""
+    mensaje = models.TextField()
+    fecha_generacion = models.DateTimeField(auto_now_add=True)
+    leida = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'Notificación'
+        verbose_name_plural = 'Notificaciones'
+        ordering = ['-fecha_generacion']
+
+    def __str__(self):
+        return f"{self.mensaje[:50]} - {self.fecha_generacion}"

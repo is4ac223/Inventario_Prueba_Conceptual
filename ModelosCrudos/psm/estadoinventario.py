@@ -1,19 +1,13 @@
 #-*- coding: utf-8 -*-
 from django.db import models
 
-class Inventario(models.Model):
+class EstadoInventario(models.Model):
     class Meta:
         pass
 
     ubicacionAlmacenamiento = models.CharField()
     capacidadMaxina = models.CharField()
     fechaUltimaRevision = models.CharField()
-    totalMateriaPrimaAlmacenada = models.CharField()
-    totalProductoAlmacenado = models.CharField()
-
-    def guardar(self, ):
-        pass
-
-    def restaura(self, e):
-        pass
+    totalMateriaPrima = models.CharField()
+    totalProducto = models.CharField()
 
