@@ -32,16 +32,13 @@ class EntradaCommand(MovimientoCommand):
     def ejecutar(self):
         """Ejecuta el comando de entrada"""
         from api.models import MovimientoInventario, TipoMovimiento
-        from datetime import date
 
         # Actualizar stock
         self.item_inventario.stock_actual += self.cantidad
         self.item_inventario.save()
 
-        # Registrar movimiento
+        # Registrar movimiento (fecha y fecha_registro se asignan automáticamente)
         movimiento = MovimientoInventario.objects.create(
-            fecha_llegada=date.today(),
-            fecha_registro=date.today(),
             cantidad=self.cantidad,
             item_movido=self.item_inventario.nombre,
             motivo=self.motivo,
@@ -66,7 +63,6 @@ class SalidaCommand(MovimientoCommand):
     def ejecutar(self):
         """Ejecuta el comando de salida"""
         from api.models import MovimientoInventario, TipoMovimiento
-        from datetime import date
 
         # Verificar stock disponible
         if self.item_inventario.stock_actual < self.cantidad:
@@ -77,10 +73,10 @@ class SalidaCommand(MovimientoCommand):
         self.item_inventario.stock_actual -= self.cantidad
         self.item_inventario.save()
 
-        # Registrar movimiento
+        # Registrar movimiento (fecha y fecha_registro se asignan automáticamente)
         movimiento = MovimientoInventario.objects.create(
-            fecha=date.today(),
             cantidad=self.cantidad,
+            item_movido=self.item_inventario.nombre,
             motivo=self.motivo,
             encargado=self.encargado,
             tipo_movimiento=TipoMovimiento.SALIDA

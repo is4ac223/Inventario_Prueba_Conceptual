@@ -5,7 +5,10 @@ from .views import (
     MovimientoInventarioViewSet, RegistrarMovimientoView,
     LoginEncargadoView,
     MateriaPrimaListCreateView, MateriaPrimaDetailView,
-    ProductoListCreateView, ProductoDetailView
+    ProductoListCreateView, ProductoDetailView,
+    NotificacionesViewSet,
+    EstadoInventarioView, GuardarEstadoInventarioView,
+    RestaurarEstadoInventarioView
 )
 
 router = DefaultRouter()
@@ -14,6 +17,8 @@ router.register(r'encargados', EncargadoInventarioViewSet,
 router.register(r'inventarios', InventarioViewSet, basename='inventario')
 router.register(r'movimientos', MovimientoInventarioViewSet,
                 basename='movimiento')
+router.register(r'notificaciones', NotificacionesViewSet,
+                basename='notificacion')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -28,4 +33,10 @@ urlpatterns = [
     path('registrar-movimiento/', RegistrarMovimientoView.as_view(),
          name='registrar-movimiento'),
     path('login/', LoginEncargadoView.as_view(), name='login'),
+    path('estado-inventario/', EstadoInventarioView.as_view(),
+         name='estado-inventario'),
+    path('guardar-estado/', GuardarEstadoInventarioView.as_view(),
+         name='guardar-estado'),
+    path('restaurar-estado/', RestaurarEstadoInventarioView.as_view(),
+         name='restaurar-estado'),
 ]

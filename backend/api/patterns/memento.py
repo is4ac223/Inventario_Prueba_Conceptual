@@ -14,12 +14,16 @@ class EstadoInventario:
     """
 
     def __init__(self, ubicacion_almacenamiento, capacidad_maxima,
-                 fecha_ultima_revision, total_materia_prima, total_producto):
+                 fecha_ultima_revision, total_materia_prima, total_producto,
+                 stocks_materias_primas=None, stocks_productos=None):
         self.ubicacion_almacenamiento = ubicacion_almacenamiento
         self.capacidad_maxima = capacidad_maxima
         self.fecha_ultima_revision = fecha_ultima_revision
         self.total_materia_prima = total_materia_prima
         self.total_producto = total_producto
+        # Guardar stocks individuales de cada item
+        self.stocks_materias_primas = stocks_materias_primas or {}  # {id: stock_actual}
+        self.stocks_productos = stocks_productos or {}  # {id: stock_actual}
         self.fecha_respaldo = datetime.now()
 
     def to_dict(self) -> Dict[str, Any]:
@@ -30,7 +34,9 @@ class EstadoInventario:
             'fecha_ultima_revision': str(self.fecha_ultima_revision),
             'total_materia_prima': self.total_materia_prima,
             'total_producto': self.total_producto,
-            'fecha_respaldo': str(self.fecha_respaldo)
+            'fecha_respaldo': str(self.fecha_respaldo),
+            'items_materias_primas': len(self.stocks_materias_primas),
+            'items_productos': len(self.stocks_productos)
         }
 
     @classmethod
@@ -57,7 +63,7 @@ class HistorialInventario:
 
     def respaldar(self, inventario):
         """
-        Guarda el estado actual del inventario.
+        Guarda el estado actual del inventario incluyendo stocks individuales.
 
         Args:
             inventario: Instancia del modelo Inventario
@@ -67,14 +73,21 @@ class HistorialInventario:
         """
         from api.models import MateriaPrima, Producto
 
-        # Calcular totales
-        total_materia_prima = MateriaPrima.objects.filter(
-            inventario=inventario
-        ).count()
+        # Obtener todas las materias primas y productos
+        materias_primas = MateriaPrima.objects.filter(inventario=inventario)
+        productos = Producto.objects.filter(inventario=inventario)
 
-        total_producto = Producto.objects.filter(
-            inventario=inventario
-        ).count()
+        # Guardar stocks actuales de cada item
+        stocks_materias_primas = {
+            mp.id: mp.stock_actual for mp in materias_primas
+        }
+        stocks_productos = {
+            p.id: p.stock_actual for p in productos
+        }
+
+        # Calcular totales
+        total_materia_prima = materias_primas.count()
+        total_producto = productos.count()
 
         # Crear memento
         estado = EstadoInventario(
@@ -82,7 +95,9 @@ class HistorialInventario:
             capacidad_maxima=inventario.capacidad_maxima,
             fecha_ultima_revision=inventario.fecha_ultima_revision,
             total_materia_prima=total_materia_prima,
-            total_producto=total_producto
+            total_producto=total_producto,
+            stocks_materias_primas=stocks_materias_primas,
+            stocks_productos=stocks_productos
         )
 
         self._historial.append(estado)
@@ -107,16 +122,39 @@ class HistorialInventario:
 
     def _restaurar_estado(self, inventario, estado):
         """
-        Restaura el estado del inventario.
+        Restaura el estado del inventario incluyendo stocks individuales.
 
         Args:
             inventario: Instancia del modelo Inventario
             estado: EstadoInventario a restaurar
         """
+        from api.models import MateriaPrima, Producto
+
+        # Restaurar información básica del inventario
         inventario.ubicacion_almacenamiento = estado.ubicacion_almacenamiento
         inventario.capacidad_maxima = estado.capacidad_maxima
         inventario.fecha_ultima_revision = estado.fecha_ultima_revision
         inventario.save()
+
+        # Restaurar stocks de materias primas
+        for item_id, stock in estado.stocks_materias_primas.items():
+            try:
+                materia_prima = MateriaPrima.objects.get(id=item_id)
+                materia_prima.stock_actual = stock
+                materia_prima.save()
+            except MateriaPrima.DoesNotExist:
+                # Item ya no existe, simplemente continuar
+                pass
+
+        # Restaurar stocks de productos
+        for item_id, stock in estado.stocks_productos.items():
+            try:
+                producto = Producto.objects.get(id=item_id)
+                producto.stock_actual = stock
+                producto.save()
+            except Producto.DoesNotExist:
+                # Item ya no existe, simplemente continuar
+                pass
 
     def obtener_historial(self):
         """Retorna la lista de estados guardados"""

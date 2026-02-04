@@ -4,12 +4,14 @@
 	import VistaInventario from './VistaInventario.svelte';
 	import GestionProductosTerminados from './GestionProductosTerminados.svelte';
 	import GestionMateriasPrimas from './GestionMateriasPrimas.svelte';
+	import Notificaciones from './Notificaciones.svelte';
+	import EstadoInventario from './EstadoInventario.svelte';
 	
 	export let encargado;
 	
 	const dispatch = createEventDispatcher();
 	
-	let seccionActual = 'inventario'; // 'inventario', 'productos', 'materias'
+	let seccionActual = 'inventario'; // 'inventario', 'productos', 'materias', 'estado'
 	let actualizarInventario = 0;
 
 	function handleMovimientoRegistrado() {
@@ -31,6 +33,7 @@
 		<div class="header-content">
 			<h1>Sistema de Gestión de Inventario</h1>
 			<div class="user-info">
+				<Notificaciones />
 				<span>👤 {encargado.nombre_completo}</span>
 				<button class="btn-logout" on:click={logout}>Cerrar Sesión</button>
 			</div>
@@ -46,6 +49,13 @@
 				on:click={() => cambiarSeccion('inventario')}
 			>
 				📦 Movimientos de Inventario
+			</button>
+			<button 
+				class="nav-btn" 
+				class:active={seccionActual === 'estado'}
+				on:click={() => cambiarSeccion('estado')}
+			>
+				📊 Estado del Inventario
 			</button>
 			<button 
 				class="nav-btn" 
@@ -77,6 +87,10 @@
 			<div class="panel panel-right">
 				<h2>Estado del Inventario</h2>
 				<VistaInventario refresh={actualizarInventario} />
+			</div>
+		{:else if seccionActual === 'estado'}
+			<div class="panel panel-full">
+				<EstadoInventario />
 			</div>
 		{:else if seccionActual === 'productos'}
 			<div class="panel panel-full">

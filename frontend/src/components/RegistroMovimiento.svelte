@@ -17,6 +17,7 @@
 	let error = '';
 	let success = '';
 	let advertencia = '';
+	let alertaStockBajo = '';
 	let requiereConfirmacion = false;
 
 	const tiposMovimiento = [
@@ -50,6 +51,7 @@
 		error = '';
 		success = '';
 		advertencia = '';
+		alertaStockBajo = '';
 		loading = true;
 		
 		if (!itemSeleccionado || !cantidad || !motivo) {
@@ -84,8 +86,24 @@
 					advertencia = data.advertencia;
 					requiereConfirmacion = true;
 				} else {
-					success = `${data.mensaje}\nStock anterior: ${data.stock_anterior} → Stock actual: ${data.stock_actual}`;
+					// Limpiar formulario primero
 					limpiarFormulario();
+					
+					// Mensaje de éxito mejorado con información de patrones
+					let mensajeExito = `✅ ${data.mensaje}\n`;
+					mensajeExito += `📊 Stock anterior: ${data.stock_anterior} → Stock actual: ${data.stock_actual}\n`;
+					
+					if (data.patrones_usados && data.patrones_usados.length > 0) {
+						mensajeExito += `🎯 Patrones utilizados: ${data.patrones_usados.join(', ')}`;
+					}
+					
+					success = mensajeExito;
+					
+					// Si hay alerta de stock bajo, mostrar cuadro separado
+					if (data.alerta_stock_bajo) {
+						alertaStockBajo = `⚠️ STOCK BAJO DETECTADO\n\nSe ha generado una notificación automática usando el patrón Observer.\nRevisa el icono de notificaciones 🔔 en el header.`;
+					}
+					
 					dispatch('movimientoRegistrado');
 				}
 			} else {
@@ -114,6 +132,7 @@
 		motivo = '';
 		requiereConfirmacion = false;
 		advertencia = '';
+		alertaStockBajo = '';
 	}
 
 	$: itemSeleccionadoData = items.find(i => i.id === parseInt(itemSeleccionado));
@@ -223,6 +242,10 @@
 
 		{#if success}
 			<div class="success-message">{success}</div>
+		{/if}
+
+		{#if alertaStockBajo}
+			<div class="alert-stock-bajo">{alertaStockBajo}</div>
 		{/if}
 
 		{#if !advertencia}
@@ -335,6 +358,30 @@
 		margin-bottom: 1rem;
 		border-left: 4px solid #2a7;
 		white-space: pre-line;
+	}
+	
+	.alert-stock-bajo {
+		background: linear-gradient(135deg, #fff3cd 0%, #ffe5e5 100%);
+		color: #721c24;
+		padding: 1rem;
+		border-radius: 6px;
+		margin-bottom: 1rem;
+		border-left: 6px solid #ff6b6b;
+		white-space: pre-line;
+		font-weight: 500;
+		box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);
+		animation: slideIn 0.3s ease-out;
+	}
+	
+	@keyframes slideIn {
+		from {
+			opacity: 0;
+			transform: translateY(-10px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 	
 	.warning-message {

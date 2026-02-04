@@ -117,9 +117,9 @@ class Inventario(models.Model):
 
 class MovimientoInventario(models.Model):
     """Movimientos del inventario"""
-    fecha = models.DateField(default=timezone.now)
+    fecha = models.DateField(auto_now_add=True)
     fecha_llegada = models.DateField(blank=True, null=True)
-    fecha_registro = models.DateTimeField(blank=True, null=True)
+    fecha_registro = models.DateTimeField(auto_now_add=True)
     cantidad = models.IntegerField()
     motivo = models.TextField(blank=True, null=True)
     responsable_ejecuta = models.CharField(

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import (
     EncargadoInventario, Inventario, MovimientoInventario,
-    MateriaPrima, Producto, TipoMovimiento
+    MateriaPrima, Producto, TipoMovimiento, Notificacion
 )
 
 
@@ -141,3 +141,12 @@ class RegistrarMovimientoSerializer(serializers.Serializer):
         data['encargado'] = encargado
 
         return data
+
+
+class NotificacionSerializer(serializers.ModelSerializer):
+    """Serializer para notificaciones"""
+
+    class Meta:
+        model = Notificacion
+        fields = ['id', 'mensaje', 'fecha_generacion', 'leida']
+        read_only_fields = ['id', 'fecha_generacion']
