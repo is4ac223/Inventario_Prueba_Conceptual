@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=(n-vfkp*frj!ttrqhfyol08-z_b(ilzgjb@-d_^1yamq76iu9'
+SECRET_KEY = os.getenv(
+    'SECRET_KEY', 'django-insecure-=(n-vfkp*frj!ttrqhfyol08-z_b(ilzgjb@-d_^1yamq76iu9')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -54,9 +56,14 @@ MIDDLEWARE = [
 ]
 
 # CORS settings
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False') == 'True'
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Configure allowed origins for CORS
+_cors_origins = os.getenv('CORS_ALLOWED_ORIGINS',
+                          'http://localhost:5000,http://127.0.0.1:5000')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in _cors_origins.split(',')]
 
 # Headers adicionales para CORS
 CORS_ALLOW_HEADERS = [
@@ -80,10 +87,10 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
-]
+# Configure CSRF trusted origins
+_csrf_origins = os.getenv(
+    'CSRF_TRUSTED_ORIGINS', 'http://localhost:5000,http://127.0.0.1:5000,http://localhost:3000,http://127.0.0.1:3000')
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _csrf_origins.split(',')]
 
 ROOT_URLCONF = 'backend.urls'
 

@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset='utf-8'>
 	<meta name='viewport' content='width=device-width,initial-scale=1'>
 
-	<title>Svelte app</title>
+	<title>Sistema de Gestión de Inventario</title>
 
 	<link rel='icon' type='image/png' href='/favicon.png'>
 	<link rel='stylesheet' href='/global.css'>
 	<link rel='stylesheet' href='/build/bundle.css'>
+
+	<script>
+		// Configure API URL - can be overridden by Docker environment
+		window.__API_URL__ = window.__API_URL__ || 'http://localhost:8000/api';
+	</script>
 
 	<script defer src='/build/bundle.js'></script>
 </head>
 
 <body>
 </body>
+
 </html>

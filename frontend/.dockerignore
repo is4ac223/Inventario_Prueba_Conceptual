@@ -1,0 +1,15 @@
+node_modules
+dist
+build
+.env
+.env.local
+.git
+.gitignore
+README.md
+.DS_Store
+npm-debug.log
+yarn-error.log
+.next
+out
+*.swp
+*.swo

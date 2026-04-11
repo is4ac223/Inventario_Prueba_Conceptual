@@ -1,0 +1,67 @@
+version: "3.8"
+
+services:
+  # Backend Django
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: inventario_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=django-insecure-docker-key-change-in-production-=(n-vfkp*frj!ttrqhfyol08-z_b
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend,host.docker.internal
+      - CORS_ALLOWED_ORIGINS=http://localhost:5000,http://127.0.0.1:5000,http://frontend:5000,http://host.docker.internal:5000
+    volumes:
+      - ./backend:/app
+      - backend_db:/app/db_volume
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    networks:
+      - inventario_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Frontend Svelte
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: inventario_frontend
+    ports:
+      - "5000:5000"
+    environment:
+      - API_URL=http://backend:8000/api
+      - NODE_ENV=production
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - inventario_network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:5000",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  backend_db:
+    driver: local
+
+networks:
+  inventario_network:
+    driver: bridge
