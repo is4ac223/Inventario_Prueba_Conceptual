@@ -11,6 +11,32 @@ class EncargadoInventarioSerializer(serializers.ModelSerializer):
         fields = ['id', 'nombre_completo', 'fecha_contrato', 'tipo_documento']
 
 
+class EncargadoInventarioLoginSerializer(serializers.Serializer):
+    """Serializer para el login de encargados"""
+    nombre_completo = serializers.CharField(required=True, max_length=255)
+    password = serializers.CharField(required=True, max_length=255)
+
+    def validate(self, data):
+        """Valida las credenciales del usuario"""
+        nombre = data.get('nombre_completo', '').strip()
+        password = data.get('password', '').strip()
+
+        if not nombre or not password:
+            raise serializers.ValidationError(
+                'Nombre de usuario y contraseña son requeridos')
+
+        try:
+            encargado = EncargadoInventario.objects.get(
+                nombre_completo__iexact=nombre)
+            if not encargado.check_password(password):
+                raise serializers.ValidationError('Contraseña incorrecta')
+            data['encargado'] = encargado
+        except EncargadoInventario.DoesNotExist:
+            raise serializers.ValidationError('Encargado no encontrado')
+
+        return data
+
+
 class InventarioSerializer(serializers.ModelSerializer):
     materias_primas_count = serializers.SerializerMethodField()
     productos_count = serializers.SerializerMethodField()

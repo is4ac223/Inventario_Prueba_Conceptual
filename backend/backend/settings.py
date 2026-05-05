@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,8 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv(
-    'SECRET_KEY', 'django-insecure-=(n-vfkp*frj!ttrqhfyol08-z_b(ilzgjb@-d_^1yamq76iu9')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
@@ -117,8 +120,8 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.getenv('DATABASE_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': BASE_DIR / os.getenv('DATABASE_NAME', 'db.sqlite3'),
     }
 }
 
@@ -140,6 +143,28 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Password Hashing - Argon2id (Memory-Hard, GPU-Resistant)
+# https://docs.djangoproject.com/en/6.0/ref/settings/#password-hashers
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.ScryptPasswordHasher',
+]
+
+# Argon2 Configuration
+# Parameters: time_cost, memory_cost, parallelism
+# Adjust based on security requirements and server capacity
+ARGON2_PASSWORD_HASHERS_SETTINGS = {
+    # Iteraciones (2-4)
+    'time_cost': int(os.getenv('ARGON2_TIME_COST', '2')),
+    # KB de memoria (256-1024)
+    'memory_cost': int(os.getenv('ARGON2_MEMORY_COST', '512')),
+    # Threads (1-4)
+    'parallelism': int(os.getenv('ARGON2_PARALLELISM', '2')),
+}
 
 
 # Internationalization

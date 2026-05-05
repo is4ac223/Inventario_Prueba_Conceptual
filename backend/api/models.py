@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.hashers import make_password, check_password
 
 
 # Enumeraciones
@@ -56,6 +57,7 @@ class UnidadVentaAgrupada(models.Model):
 class EncargadoInventario(models.Model):
     """Encargados del inventario"""
     nombre_completo = models.TextField()
+    password = models.CharField(max_length=255, blank=True, default='')
     fecha_contrato = models.DateField()
     tipo_documento = models.CharField(
         max_length=20,
@@ -70,6 +72,15 @@ class EncargadoInventario(models.Model):
 
     def __str__(self):
         return self.nombre_completo
+
+    def set_password(self, raw_password):
+        """Hash y guarda la contraseña"""
+        self.password = make_password(raw_password)
+        self.save()
+
+    def check_password(self, raw_password):
+        """Verifica si la contraseña proporcionada es correcta"""
+        return check_password(raw_password, self.password)
 
 
 class Inventario(models.Model):

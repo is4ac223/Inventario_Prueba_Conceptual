@@ -318,35 +318,24 @@ class RegistrarMovimientoView(APIView):
 
 
 class LoginEncargadoView(APIView):
-    """Vista simple de autenticación para encargados"""
+    """Vista de autenticación segura para encargados"""
 
     def post(self, request):
-        nombre = request.data.get('nombre_completo', '').strip()
-        print(
-            f"Todos los que existen son: {EncargadoInventario.objects.all()}")
+        from .serializers import EncargadoInventarioLoginSerializer
 
-        if not nombre:
-            return Response({
-                'error': 'Debe ingresar el nombre completo'
-            }, status=status.HTTP_400_BAD_REQUEST)
+        serializer = EncargadoInventarioLoginSerializer(data=request.data)
 
-        try:
-            print(
-                f"Todos los que existen son: {EncargadoInventario.objects.all()}")
-            encargado = EncargadoInventario.objects.get(
-                nombre_completo__iexact=nombre)
-            serializer = EncargadoInventarioSerializer(encargado)
+        if serializer.is_valid():
+            encargado = serializer.validated_data['encargado']
+            encargado_serializer = EncargadoInventarioSerializer(encargado)
             return Response({
                 'mensaje': 'Login exitoso',
-                'encargado': serializer.data
+                'encargado': encargado_serializer.data
             }, status=status.HTTP_200_OK)
-        except EncargadoInventario.DoesNotExist:
-            print(
-                f"Todos los que existen son: {EncargadoInventario.objects.all()}")
-            return Response({
-                'error': 'Encargado no encontrado. Verifique el nombre.'
-            }, status=status.HTTP_404_NOT_FOUND)
-        print("no existes pendejo")
+
+        return Response({
+            'error': serializer.errors
+        }, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class NotificacionesViewSet(viewsets.ModelViewSet):

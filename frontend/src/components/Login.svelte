@@ -5,6 +5,7 @@
 	const API_URL = 'http://127.0.0.1:8000/api';
 	
 	let nombreCompleto = '';
+	let password = '';
 	let error = '';
 	let loading = false;
 
@@ -12,13 +13,23 @@
 		error = '';
 		loading = true;
 		
+		// Validación básica del cliente
+		if (!nombreCompleto.trim() || !password.trim()) {
+			error = 'Por favor complete todos los campos';
+			loading = false;
+			return;
+		}
+		
 		try {
-			const response = await fetch(`http://127.0.0.1:8000/api/login/`, {
+			const response = await fetch(`${API_URL}/login/`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ nombre_completo: nombreCompleto })
+				body: JSON.stringify({ 
+					nombre_completo: nombreCompleto,
+					password: password
+				})
 			});
 			
 			const data = await response.json();
@@ -26,7 +37,17 @@
 			if (response.ok) {
 				dispatch('login', data.encargado);
 			} else {
-				error = data.error || 'Error al iniciar sesión';
+				// Mostrar errores del servidor
+				if (data.error) {
+					if (typeof data.error === 'object') {
+						// Manejar errores de validación del serializer
+						error = Object.values(data.error).flat().join(', ');
+					} else {
+						error = data.error;
+					}
+				} else {
+					error = 'Error al iniciar sesión. Verifique sus credenciales.';
+				}
 			}
 		} catch (err) {
 			error = 'Error de conexión con el servidor';
@@ -40,7 +61,7 @@
 <div class="login-container">
 	<div class="login-card">
 		<h1>Sistema de Inventario</h1>
-		<h2>Login - Encargado de Inventario</h2>
+		<h2>Inicio de Sesión</h2>
 		
 		<form on:submit|preventDefault={handleSubmit}>
 			<div class="form-group">
@@ -50,6 +71,18 @@
 					type="text" 
 					bind:value={nombreCompleto}
 					placeholder="Ingrese su nombre completo"
+					required
+					disabled={loading}
+				/>
+			</div>
+			
+			<div class="form-group">
+				<label for="password">Contraseña:</label>
+				<input 
+					id="password"
+					type="password" 
+					bind:value={password}
+					placeholder="Ingrese su contraseña"
 					required
 					disabled={loading}
 				/>
@@ -65,7 +98,7 @@
 		</form>
 		
 		<div class="info">
-			<p><strong>Nota:</strong> Para demostración, ingrese el nombre completo registrado en el sistema.</p>
+			<p><strong>Nota:</strong> Ingrese su nombre de usuario y contraseña para acceder al sistema.</p>
 		</div>
 	</div>
 </div>
